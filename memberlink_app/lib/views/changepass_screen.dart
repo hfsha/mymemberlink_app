@@ -232,7 +232,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   void _changePassword() async {
     String newPassword = passwordController.text;
-    String confirmPassword = confirmPasswordController.text;
+    //String confirmPassword = confirmPasswordController.text;
 
     try {
       setState(() => _isLoading = true);
