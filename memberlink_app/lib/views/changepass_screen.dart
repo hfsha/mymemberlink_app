@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:memberlink_app/myconfig.dart';
 import 'package:memberlink_app/views/login_screen.dart';
+// import 'package:crypto/crypto.dart';
+// import 'dart:convert'; // For utf8.encode
 
 class ChangePasswordPage extends StatefulWidget {
   final String email;
@@ -154,29 +156,22 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     if (password.isEmpty || confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Please enter all your details"),
+        backgroundColor: Colors.red,
       ));
       return;
     }
 
-    // Correct regex for password validation: At least 8 characters, letters, and numbers
+    // Password validation
     if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$').hasMatch(password)) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text(
-          "Password must be at least 8 characters long and include both letters and numbers.",
-        ),
+            "Password must be at least 8 characters long and include both letters and numbers."),
+        backgroundColor: Colors.red,
       ));
       return;
     }
 
-    if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$')
-        .hasMatch(confirmPassword)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text(
-          "Password must be at least 8 characters long and include both letters and numbers.",
-        ),
-      ));
-      return;
-    }
+    // Check if passwords match
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Passwords do not match. Please try again."),
@@ -185,15 +180,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       return;
     }
 
-    // Check if password and confirm password match
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Passwords do not match"),
-      ));
-      return;
-    }
-
-    // Show confirmation dialog before changing password
+    // Show confirmation dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -202,16 +189,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             borderRadius: BorderRadius.all(Radius.circular(20.0)),
           ),
           title: const Text("Change password"),
-          content: const Text("Are you sure?"),
+          content: const Text("Are you sure you want to change your password?"),
           actions: <Widget>[
             TextButton(
               child: const Text("Yes"),
-              onPressed: () {
-                _changePassword();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                );
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close the dialog
+                await _changePassword();
               },
             ),
             TextButton(
@@ -230,14 +214,15 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  void _changePassword() async {
+  Future<void> _changePassword() async {
     String newPassword = passwordController.text;
-    //String confirmPassword = confirmPasswordController.text;
 
     try {
       setState(() => _isLoading = true);
+
       http.Response response = await http.post(
-        Uri.parse("${Myconfig.servername}/memberlink_backend/update_pass.php"),
+        Uri.parse(
+            "${Myconfig.servername}/mymemberlink_backend/update_pass.php"),
         body: {"email": widget.email, "password": newPassword},
       );
 
@@ -252,20 +237,33 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             context,
             MaterialPageRoute(builder: (content) => const LoginScreen()),
           );
+        } else if (data['status'] == "update_failed") {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Failed to update password. Please try again."),
+            backgroundColor: Colors.red,
+          ));
+        } else if (data['status'] == "no_email") {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Email not found. Please try again."),
+            backgroundColor: Colors.red,
+          ));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Password change failed"),
+            content: Text("Unexpected error. Please try again."),
             backgroundColor: Colors.red,
           ));
         }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Server error. Please try again later."),
+          backgroundColor: Colors.red,
+        ));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("An error occurred: $e"),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("An error occurred: $e"),
+        backgroundColor: Colors.red,
+      ));
     } finally {
       setState(() => _isLoading = false);
     }
