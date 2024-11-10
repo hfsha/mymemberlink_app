@@ -232,11 +232,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   void _changePassword() async {
     String newPassword = passwordController.text;
+    String confirmPassword = confirmPasswordController.text;
 
     try {
       setState(() => _isLoading = true);
       http.Response response = await http.post(
-        Uri.parse("${Myconfig.servername}/membership/api/update_pass.php"),
+        Uri.parse("${Myconfig.servername}/memberlink_backend/update_pass.php"),
         body: {"email": widget.email, "password": newPassword},
       );
 
