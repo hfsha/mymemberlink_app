@@ -1,0 +1,25 @@
+name: memberlink_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  email_otp: ^3.0.2
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  pinput: ^5.0.0
+  shared_preferences: ^2.3.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+     - assets/images/
