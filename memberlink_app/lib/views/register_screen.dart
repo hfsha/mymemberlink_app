@@ -379,10 +379,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
+
+      if (data['status'] == "email_exists") {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Email already exists. Please use a different email."),
+          backgroundColor: Colors.red,
+        ));
+        return false;
+      }
+
       if (data['status'] == "success") {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Registration Success"),
-          backgroundColor: Color.fromARGB(255, 12, 12, 12),
+          content: Text("Registration Successful"),
+          backgroundColor: Colors.green,
         ));
         return true;
       } else {

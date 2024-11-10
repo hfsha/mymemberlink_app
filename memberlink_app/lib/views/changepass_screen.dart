@@ -39,8 +39,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Center(
-                    child: const Text(
+                  const Center(
+                    child: Text(
                       'Change Your Password',
                       style: TextStyle(
                         fontSize: 24,

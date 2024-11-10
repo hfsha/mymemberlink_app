@@ -22,11 +22,11 @@ class _VerificationScreenState extends State<VerificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Verify OTP"),
+        title: const Text("Verify OTP"),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -43,7 +43,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
               //   height: 325,
               //   width: 325,
               // ),
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
               const Text(
                 'Enter your Verification code',
                 style: TextStyle(
@@ -81,7 +81,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -102,7 +102,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   const SizedBox(width: 20),
                 ],
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () async {
                   if (EmailOTP.verifyOTP(otp: pinController.text)) {
