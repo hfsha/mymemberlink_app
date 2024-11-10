@@ -1,3 +1,3 @@
 class Myconfig {
-  static const servername = "http://10.143.163.45";
+  static const servername = "http://10.19.75.79";
 }
