@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:memberlink_app/myconfig.dart';
-import 'package:memberlink_app/views/forgotpass_screen.dart';
+import 'package:memberlink_app/views/auth/forgotpass_screen.dart';
+//import 'package:memberlink_app/views/events/event_screen.dart';
+//import 'package:memberlink_app/views/main_screen.dart';
+import 'package:memberlink_app/views/auth/register_screen.dart';
 import 'package:memberlink_app/views/main_screen.dart';
-import 'package:memberlink_app/views/register_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -215,6 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ));
           Navigator.push(context,
               MaterialPageRoute(builder: (content) => const MainScreen()));
+          //MaterialPageRoute(builder: (content) => const EventScreen()));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text("Login Failed"),

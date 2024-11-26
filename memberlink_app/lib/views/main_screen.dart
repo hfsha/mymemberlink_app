@@ -1,5 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:memberlink_app/views/login_screen.dart';
+import 'package:memberlink_app/models/news.dart';
+import 'package:memberlink_app/views/auth/login_screen.dart';
+import 'package:memberlink_app/views/newsletter/news_screen.dart';
+import 'package:memberlink_app/views/shared/mydrawer.dart';
+import 'package:memberlink_app/myconfig.dart';
+import 'package:http/http.dart' as http;
+//import 'news_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -9,26 +16,37 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  List<News> newsList = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadNewsData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
+        title: const Text(
+          "Home",
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.purple,
         actions: [
           IconButton(
             icon: const Icon(
               Icons.notifications_none,
-              color: Colors.purple,
+              color: Colors.white,
             ),
-            onPressed: () {
-              // Add notification functionality here if needed
-            },
+            onPressed: () {},
           ),
           IconButton(
             icon: const Icon(
               Icons.logout,
-              color: Colors.purple,
+              color: Colors.white,
             ),
             onPressed: () {
               _logout(context);
@@ -36,24 +54,96 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
+      drawer: const MyDrawer(),
       backgroundColor: Colors.white,
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'Welcome to Memberlink!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.purple,
-              ),
-              textAlign: TextAlign.center,
-            ),
             const SizedBox(height: 20),
-            Image.asset(
-              'assets/images/changepass.png', // Replace with your asset image path
-              height: 200,
+            // Welcome Section
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  const Text(
+                    'Welcome to Memberlink!',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  Image.asset(
+                    'assets/images/changepass.png',
+                    height: 200,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            // Newsletter Section
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 238, 223, 241),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    offset: const Offset(0, 2),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Newsletter",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : Column(
+                          children: newsList.take(5).map((news) {
+                            return _buildNewsItem(
+                              title: news.newsTitle ?? '',
+                              date: news.newsDate ?? '',
+                              details: news.newsDetails ?? '',
+                            );
+                          }).toList(),
+                        ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.end, // Aligns the button to the right
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const NewsScreen()),
+                          );
+                        },
+                        child: const Text(
+                          "See more >",
+                          style: TextStyle(color: Colors.purple),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -61,7 +151,65 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // Function to handle logout
+  // Builds individual news items
+  Widget _buildNewsItem(
+      {required String title, required String date, required String details}) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(12),
+        leading: CircleAvatar(
+          backgroundColor: Colors.purple.shade100,
+          child: const Icon(Icons.email_outlined, color: Colors.purple),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.purple,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              date,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              details,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 14, color: Colors.black),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void loadNewsData() {
+    final url = Uri.parse(
+        "${Myconfig.servername}/mymemberlink_backend/load_news.php?pageno=1");
+    http.get(url).then((response) {
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        if (data['status'] == "success") {
+          var result = data['data']['news'];
+          setState(() {
+            newsList = result.map<News>((item) => News.fromJson(item)).toList();
+            isLoading = false;
+          });
+        }
+      }
+    });
+  }
+
+  // Logout Dialog
   void _logout(BuildContext context) {
     showDialog(
       context: context,

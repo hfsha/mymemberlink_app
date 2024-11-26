@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:memberlink_app/myconfig.dart';
-import 'package:memberlink_app/views/login_screen.dart';
+import 'package:memberlink_app/views/auth/login_screen.dart';
 // import 'package:memberlink_app/views/main_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -319,7 +319,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return false;
     }
 
-    // Show confirmation dialog
     bool confirm = await showDialog(
       context: context,
       builder: (BuildContext context) {

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:memberlink_app/myconfig.dart';
-import 'package:memberlink_app/views/login_screen.dart';
+import 'package:memberlink_app/views/auth/login_screen.dart';
 // import 'package:crypto/crypto.dart';
 // import 'dart:convert'; // For utf8.encode
 

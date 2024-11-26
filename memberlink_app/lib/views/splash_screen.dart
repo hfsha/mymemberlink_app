@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:memberlink_app/views/login_screen.dart';
-import 'package:memberlink_app/views/register_screen.dart';
+import 'package:memberlink_app/views/auth/login_screen.dart';
+import 'package:memberlink_app/views/auth/register_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,6 +22,9 @@ class _SplashScreenState extends State<SplashScreen> {
               height: 150,
             ),
             const Image(image: AssetImage('assets/images/logo.png')),
+            const SizedBox(
+              height: 20,
+            ),
             MaterialButton(
                 elevation: 10,
                 onPressed: () {

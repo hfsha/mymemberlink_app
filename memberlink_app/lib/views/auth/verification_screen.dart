@@ -1,6 +1,6 @@
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
-import 'package:memberlink_app/views/changepass_screen.dart';
+import 'package:memberlink_app/views/auth/changepass_screen.dart';
 // import 'package:lottie/lottie.dart';
 // import 'package:mymembership_app/views/changepass_screen.dart';
 import 'package:pinput/pinput.dart';
