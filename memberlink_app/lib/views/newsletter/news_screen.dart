@@ -26,11 +26,14 @@ class _NewsScreenState extends State<NewsScreen> {
   late double screenWidth, screenHeight;
   DateTime? startDate;
   DateTime? endDate;
+  int? selectedIndex; // Add this to track selected index
+  List<bool> favorites = [];
 
   @override
   void initState() {
     super.initState();
     loadNewsData();
+    favorites = List<bool>.filled(newsList.length, false);
   }
 
   @override
@@ -65,9 +68,8 @@ class _NewsScreenState extends State<NewsScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              // Reset filters and pagination
-              resetFilters(); // Ensure filters are reset
-              loadNewsData(); // Reload the news with default settings
+              resetFilters();
+              loadNewsData();
             },
             icon: const Icon(
               Icons.refresh,
@@ -187,94 +189,142 @@ class _NewsScreenState extends State<NewsScreen> {
                       child: ListView.builder(
                         itemCount: newsList.length,
                         itemBuilder: (context, index) {
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 12.0, vertical: 8.0),
-                            elevation: 3,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: ListTile(
-                              onLongPress: () {
-                                deleteDialog(index);
-                              },
-                              contentPadding: const EdgeInsets.all(12.0),
-                              leading: Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.purple.shade100,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(
-                                          0.5), // Dark shadow for inset effect
-                                      offset: const Offset(-2,
-                                          -2), // Negative offset for inward shadow
-                                      blurRadius:
-                                          6, // Soft blur to create an inset effect
-                                      spreadRadius:
-                                          -6, // Negative spread radius to push shadow inside
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedIndex = (selectedIndex == index)
+                                    ? null
+                                    : index; // Toggle selection
+                              });
+                            },
+                            child: Card(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 12.0, vertical: 8.0),
+                              elevation: 3,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              color: selectedIndex == index
+                                  ? const Color.fromARGB(
+                                      255, 241, 45, 201) // Color when selected
+                                  : Colors.white, // Default color
+                              child: ListTile(
+                                onLongPress: () {
+                                  deleteDialog(index);
+                                },
+                                contentPadding: const EdgeInsets.all(12.0),
+                                leading: Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.purple.shade100,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.5),
+                                        offset: const Offset(-2, -2),
+                                        blurRadius: 6,
+                                        spreadRadius: -6,
+                                      ),
+                                    ],
+                                  ),
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.purple.shade100,
+                                    radius: 22,
+                                    child: const Icon(
+                                      Icons.email_outlined,
+                                      color: Colors.purple,
+                                      size: 24,
                                     ),
-                                  ],
-                                ),
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.purple
-                                      .shade100, // Light purple background
-                                  radius: 22, // Size of the avatar
-                                  child: const Icon(
-                                    Icons.email_outlined, // The email icon
-                                    color: Colors.purple,
-                                    size: 24, // Icon size
                                   ),
                                 ),
-                              ),
-                              title: Text(
-                                truncateString(
-                                    newsList[index].newsTitle.toString(), 30),
-                                style: const TextStyle(
-                                  color: Color.fromARGB(255, 110, 38, 123),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                title: Text(
+                                  truncateString(
+                                      newsList[index].newsTitle.toString(), 30),
+                                  style: const TextStyle(
+                                    color: Color.fromARGB(255, 110, 38, 123),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(
-                                    top:
-                                        4.0), // Space between title and subtitle
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                subtitle: Padding(
+                                  padding: const EdgeInsets.only(top: 4.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        df.format(DateTime.parse(newsList[index]
+                                            .newsDate
+                                            .toString())),
+                                        style: const TextStyle(
+                                            fontSize: 12, color: Colors.grey),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        truncateString(
+                                            newsList[index]
+                                                .newsDetails
+                                                .toString(),
+                                            100),
+                                        style: const TextStyle(fontSize: 14),
+                                        textAlign: TextAlign.justify,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(
-                                      df.format(DateTime.parse(
-                                          newsList[index].newsDate.toString())),
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.grey),
+                                    // Heart icon that toggles between filled and unfilled
+                                    IconButton(
+                                      icon: Icon(
+                                        favorites[index]
+                                            ? Icons.favorite
+                                            : Icons.favorite_border,
+                                        color: const Color.fromARGB(
+                                            255, 227, 131, 163),
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          favorites[index] = !favorites[
+                                              index]; // Toggle the favorite state for this item
+                                        });
+
+                                        // Show the snackbar based on whether the heart is filled or not
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              favorites[index]
+                                                  ? "Successfully added to favourites" // Success message when heart is filled
+                                                  : "News is removed from favourites", // Failure message when heart is unfilled
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            backgroundColor: favorites[index]
+                                                ? Colors.green
+                                                : Colors
+                                                    .red, // Green for success, Red for failure
+                                            duration: const Duration(
+                                                seconds:
+                                                    2), // Duration for the snackbar to show
+                                          ),
+                                        );
+                                      },
                                     ),
-                                    const SizedBox(
-                                        height:
-                                            6), // Space between date and details
-                                    Text(
-                                      truncateString(
-                                          newsList[index]
-                                              .newsDetails
-                                              .toString(),
-                                          100),
-                                      style: const TextStyle(fontSize: 14),
-                                      textAlign: TextAlign.justify,
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 18,
+                                        color: Colors.purple,
+                                      ),
+                                      onPressed: () {
+                                        showNewsDetailsDialog(index);
+                                      },
                                     ),
                                   ],
                                 ),
-                              ),
-                              trailing: IconButton(
-                                icon: const Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 18,
-                                  color: Colors.purple,
-                                ),
-                                onPressed: () {
-                                  showNewsDetailsDialog(index);
-                                },
                               ),
                             ),
                           );
@@ -316,22 +366,14 @@ class _NewsScreenState extends State<NewsScreen> {
                           // Page Numbers
                           Row(
                             children: List.generate(
-                              // Calculate the total number of pages to display (max 3 pages at a time)
-                              (numofpage <= 3)
-                                  ? numofpage
-                                  : 4, // Ensure we show a maximum of 3 pages
+                              (numofpage <= 3) ? numofpage : 4, // Max page = 4
                               (index) {
-                                // Page number calculation: Always show 3 pages centered around the current page
                                 int pageNumber = curpage - 1 + index;
 
-                                // Adjust the visible pages if we're near the start or end
                                 if (curpage == 1) {
-                                  pageNumber = index +
-                                      1; // Show 1, 2, 3 if we're at the beginning
+                                  pageNumber = index + 1;
                                 } else if (curpage == numofpage) {
-                                  pageNumber = numofpage -
-                                      2 +
-                                      index; // Show last 3 pages if we're at the end
+                                  pageNumber = numofpage - 2 + index;
                                 }
 
                                 // Ensure the page number is within valid bounds
@@ -341,8 +383,7 @@ class _NewsScreenState extends State<NewsScreen> {
                                       setState(() {
                                         curpage = pageNumber;
                                         loadNewsDataWithDateRange(
-                                            page:
-                                                curpage); // Reload data on page change
+                                            page: curpage);
                                       });
                                     },
                                     child: Text(
@@ -433,6 +474,8 @@ class _NewsScreenState extends State<NewsScreen> {
             }
             numofpage = int.parse(data['numofpage'].toString());
             numofresult = int.parse(data['numberofresult'].toString());
+
+            favorites = List.generate(newsList.length, (index) => false);
           });
         }
       }
