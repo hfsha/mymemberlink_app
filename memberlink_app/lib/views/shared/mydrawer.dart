@@ -14,7 +14,16 @@ class MyDrawer extends StatelessWidget {
         children: [
           const UserAccountsDrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.purple,
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 155, 35, 192),
+                  //Color.fromARGB(255, 190, 55, 213),
+                  Color.fromARGB(255, 236, 53, 239),
+                  //Color.fromARGB(255, 245, 116, 213),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
             accountName: Text(
               'Shahidatul Hidayah',

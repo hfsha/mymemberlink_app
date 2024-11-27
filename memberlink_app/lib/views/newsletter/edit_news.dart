@@ -40,13 +40,29 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 142, 28, 177),
+                Colors.purpleAccent,
+                Color.fromARGB(255, 245, 116, 174)
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.purple, Color.fromARGB(255, 81, 22, 92)],
+            colors: [
+              Color.fromARGB(255, 240, 211, 245),
+              Color.fromARGB(255, 240, 211, 245)
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -61,7 +77,8 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
                 children: [
                   Icon(
                     Icons.edit_outlined,
-                    color: Colors.yellow.withOpacity(0.9), // Semi-transparent.
+                    color: const Color.fromARGB(255, 42, 42, 42)
+                        .withOpacity(0.9), // Semi-transparent.
                     size: 50,
                   ),
                   const SizedBox(height: 8),
@@ -69,7 +86,7 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
                     "Edit the details below to update the newsletter.",
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white,
+                      color: Color.fromARGB(255, 44, 44, 44),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -114,11 +131,11 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
                 onPressed: onUpdateNewsDialog,
                 minWidth: screenWidth,
                 height: 50,
-                color: const Color.fromARGB(255, 232, 215, 60),
+                color: const Color.fromARGB(255, 209, 57, 235),
                 child: const Text(
                   "Update Newsletter",
                   style: TextStyle(
-                    color: Color.fromARGB(255, 57, 42, 59),
+                    color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),

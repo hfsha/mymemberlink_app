@@ -31,13 +31,30 @@ class _NewNewsScreenState extends State<NewNewsScreen> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.purple,
+        backgroundColor:
+            Colors.transparent, // Make background transparent for the gradient
         elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 142, 28, 177),
+                Colors.purpleAccent,
+                Color.fromARGB(255, 245, 116, 174)
+              ], // 3 color combination
+              begin: Alignment.topLeft, // Gradient starting position
+              end: Alignment.bottomRight, // Gradient ending position
+            ),
+          ),
+        ),
       ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.purple, Color.fromARGB(255, 81, 22, 92)],
+            colors: [
+              Color.fromARGB(255, 240, 211, 245),
+              Color.fromARGB(255, 240, 211, 245)
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -52,7 +69,8 @@ class _NewNewsScreenState extends State<NewNewsScreen> {
                 children: [
                   Icon(
                     Icons.email_outlined,
-                    color: Colors.yellow.withOpacity(0.9), // Semi-transparent.
+                    color: const Color.fromARGB(255, 42, 41, 41)
+                        .withOpacity(0.9), // Semi-transparent.
                     size: 50,
                   ),
                   const SizedBox(height: 8), // Adjust spacing if necessary.
@@ -60,7 +78,7 @@ class _NewNewsScreenState extends State<NewNewsScreen> {
                     "Fill in the details below to create a new newsletter.",
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white,
+                      color: Color.fromARGB(255, 44, 44, 44),
                     ),
                     textAlign:
                         TextAlign.center, // Center-align the text itself.
@@ -107,11 +125,11 @@ class _NewNewsScreenState extends State<NewNewsScreen> {
                 onPressed: onInsertNewsDialog,
                 minWidth: screenWidth,
                 height: 50,
-                color: const Color.fromARGB(255, 232, 215, 60),
+                color: Colors.purpleAccent,
                 child: const Text(
                   "Insert Newsletter",
                   style: TextStyle(
-                    color: Color.fromARGB(255, 57, 42, 59),
+                    color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),

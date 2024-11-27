@@ -39,9 +39,32 @@ class _NewEventScreenState extends State<NewEventScreen> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
         appBar: AppBar(
-          title: const Text("New Event"),
+          title: const Text(
+            "New Event",
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 142, 28, 177),
+                  Colors.purpleAccent,
+                  Color.fromARGB(255, 245, 116, 174),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
         ),
         body: SingleChildScrollView(
             padding: const EdgeInsets.all(8.0),
@@ -72,15 +95,21 @@ class _NewEventScreenState extends State<NewEventScreen> {
                       height: 10,
                     ),
                     TextFormField(
-                        validator: (value) =>
-                            value!.isEmpty ? "Enter Title" : null,
-                        controller: titleController,
-                        decoration: const InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                            ),
-                            hintText: "Event Title")),
+                      validator: (value) =>
+                          value!.isEmpty ? "Enter Title" : null,
+                      controller: titleController,
+                      decoration: InputDecoration(
+                        hintText: "Event Title",
+                        hintStyle: const TextStyle(color: Colors.black54),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -89,7 +118,15 @@ class _NewEventScreenState extends State<NewEventScreen> {
                           child: Column(
                             children: [
                               const Text("Select Start Date"),
-                              Text(startDateTime)
+                              Text(
+                                startDateTime,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight
+                                      .bold, // Added this line to make the text bold
+                                ),
+                              ),
                             ],
                           ),
                           onTap: () {
@@ -112,13 +149,13 @@ class _NewEventScreenState extends State<NewEventScreen> {
                                       selectTime.hour,
                                       selectTime.minute,
                                     );
-                                    print(selectedStartDateTime.toString());
                                     var formatter =
                                         DateFormat('dd-MM-yyyy hh:mm a');
                                     String formattedDate =
                                         formatter.format(selectedStartDateTime);
-                                    startDateTime = formattedDate.toString();
-                                    setState(() {});
+                                    setState(() {
+                                      startDateTime = formattedDate;
+                                    });
                                   }
                                 });
                               }
@@ -129,7 +166,15 @@ class _NewEventScreenState extends State<NewEventScreen> {
                           child: Column(
                             children: [
                               const Text("Select End Date"),
-                              Text(endDateTime)
+                              Text(
+                                endDateTime,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight
+                                      .bold, // Added this line to make the text bold
+                                ),
+                              ),
                             ],
                           ),
                           onTap: () {
@@ -156,40 +201,42 @@ class _NewEventScreenState extends State<NewEventScreen> {
                                         DateFormat('dd-MM-yyyy hh:mm a');
                                     String formattedDate =
                                         formatter.format(selectedEndDateTime);
-                                    endDateTime = formattedDate.toString();
-                                    print(endDateTime);
-                                    setState(() {});
+                                    setState(() {
+                                      endDateTime = formattedDate;
+                                    });
                                   }
                                 });
                               }
                             });
                           },
-                        )
+                        ),
                       ],
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
-                        validator: (value) =>
-                            value!.isEmpty ? "Enter Location" : null,
-                        controller: locationController,
-                        decoration: const InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                            ),
-                            hintText: "Event Location")),
+                      validator: (value) =>
+                          value!.isEmpty ? "Enter Location" : null,
+                      controller: locationController,
+                      decoration: InputDecoration(
+                        hintText: "Event Location",
+                        hintStyle: const TextStyle(color: Colors.black54),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     DropdownButtonFormField(
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        labelStyle: TextStyle(
-                            // fontSize: resWidth * 0.04,
-                            ),
-                        // icon: Icon(
-                        //   Icons.people,
-                        // ),
+                        filled: true,
+                        fillColor: Colors.white,
                       ),
                       value: eventtypevalue,
                       icon: const Icon(Icons.keyboard_arrow_down),
@@ -203,16 +250,22 @@ class _NewEventScreenState extends State<NewEventScreen> {
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
-                        validator: (value) =>
-                            value!.isEmpty ? "Enter Description" : null,
-                        controller: descriptionController,
-                        maxLines: 10,
-                        decoration: const InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                            ),
-                            hintText: "Event Description")),
+                      validator: (value) =>
+                          value!.isEmpty ? "Enter Description" : null,
+                      controller: descriptionController,
+                      maxLines: 10,
+                      decoration: InputDecoration(
+                        hintText: "Event Description",
+                        hintStyle: const TextStyle(color: Colors.black54),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     MaterialButton(
                       elevation: 10,
@@ -254,15 +307,11 @@ class _NewEventScreenState extends State<NewEventScreen> {
                       },
                       minWidth: screenWidth,
                       height: 50,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .secondary, // Uses primary color from theme
-                      child: Text(
+                      color: const Color.fromARGB(255, 209, 57, 235),
+                      child: const Text(
                         "Insert",
                         style: TextStyle(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSecondary, // Text color matches onPrimary color
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -276,38 +325,62 @@ class _NewEventScreenState extends State<NewEventScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return object of type Dialog
         return AlertDialog(
-            title: const Text(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Center(
+            child: Text(
               "Select from",
-              style: TextStyle(),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
-            content: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      fixedSize: Size(screenWidth / 4, screenHeight / 8)),
-                  child: const Text('Gallery'),
-                  onPressed: () => {
-                    Navigator.of(context).pop(),
-                    _selectfromGallery(),
-                  },
+          ),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color.fromARGB(
+                      255, 215, 73, 194), // White icon and text
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(10), // Rounded corners on button
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                 ),
-                const SizedBox(
-                  width: 8,
+                icon: const Icon(Icons.photo, size: 24), // Gallery icon
+                label: const Text('Gallery'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _selectfromGallery();
+                },
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.purple, // White icon and text
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                 ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      fixedSize: Size(screenWidth / 4, screenHeight / 8)),
-                  child: const Text('Camera'),
-                  onPressed: () => {
-                    Navigator.of(context).pop(),
-                    _selectFromCamera(),
-                  },
-                ),
-              ],
-            ));
+                icon: const Icon(Icons.camera_alt, size: 24), // Camera icon
+                label: const Text('Camera'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _selectFromCamera();
+                },
+              ),
+            ],
+          ),
+        );
       },
     );
   }

@@ -24,6 +24,8 @@ class _NewsScreenState extends State<NewsScreen> {
   String searchQuery = "";
   final TextEditingController searchController = TextEditingController();
   late double screenWidth, screenHeight;
+  DateTime? startDate;
+  DateTime? endDate;
 
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _NewsScreenState extends State<NewsScreen> {
     screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 240, 211, 245),
       appBar: AppBar(
         title: const Text(
           "Newsletter",
@@ -44,11 +47,27 @@ class _NewsScreenState extends State<NewsScreen> {
               fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors
+            .transparent, // Set to transparent to let the gradient show through
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 142, 28, 177),
+                Colors.purpleAccent,
+                Color.fromARGB(255, 245, 116, 174)
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             onPressed: () {
-              loadNewsData();
+              // Reset filters and pagination
+              resetFilters(); // Ensure filters are reset
+              loadNewsData(); // Reload the news with default settings
             },
             icon: const Icon(
               Icons.refresh,
@@ -76,34 +95,49 @@ class _NewsScreenState extends State<NewsScreen> {
                           loadNewsData(); // Reload with search query
                         },
                         decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.search,
-                              color: Color.fromARGB(255, 110, 26, 125)),
-                          suffixIcon: searchQuery.isNotEmpty
-                              ? IconButton(
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: Color.fromARGB(255, 40, 39, 39),
+                          ),
+                          suffixIcon: Row(
+                            mainAxisSize: MainAxisSize
+                                .min, // Ensures the icons don't expand too much
+                            children: [
+                              if (searchQuery.isNotEmpty)
+                                IconButton(
                                   icon: const Icon(Icons.clear,
-                                      color: Colors.purple),
+                                      color: Color.fromARGB(255, 40, 39, 39)),
                                   onPressed: () {
                                     searchController.clear();
                                     searchQuery = "";
                                     loadNewsData();
                                   },
-                                )
-                              : null,
+                                ),
+                              IconButton(
+                                icon: const Icon(Icons.filter_list,
+                                    color: Color.fromARGB(255, 40, 39, 39)),
+                                onPressed: () {
+                                  showDateRangePickerDialog();
+                                },
+                              ),
+                            ],
+                          ),
                           hintText: "Search news by title...",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: Colors.purple),
+                            borderSide: const BorderSide(color: Colors.black),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: Colors.purple),
+                            borderSide: const BorderSide(color: Colors.black),
                           ),
                         ),
                       ),
                     ),
+
                     Container(
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 238, 223, 241),
+                          color: const Color.fromARGB(255, 240, 211, 245),
                           boxShadow: [
                             BoxShadow(
                               color:
@@ -249,8 +283,20 @@ class _NewsScreenState extends State<NewsScreen> {
                     ),
 
                     Container(
-                      color: Colors.purple,
                       padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color.fromARGB(255, 142, 28, 177),
+                            Colors.purpleAccent,
+                            Color.fromARGB(255, 245, 116, 174)
+                          ], // Set your gradient colors here
+                          begin:
+                              Alignment.topLeft, // Gradient starting position
+                          end:
+                              Alignment.bottomRight, // Gradient ending position
+                        ),
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -262,7 +308,7 @@ class _NewsScreenState extends State<NewsScreen> {
                                 ? () {
                                     setState(() {
                                       curpage--;
-                                      loadNewsData();
+                                      loadNewsDataWithDateRange(page: curpage);
                                     });
                                   }
                                 : null,
@@ -270,40 +316,54 @@ class _NewsScreenState extends State<NewsScreen> {
                           // Page Numbers
                           Row(
                             children: List.generate(
-                              (numofpage <= 4) ? numofpage : 4,
+                              // Calculate the total number of pages to display (max 3 pages at a time)
+                              (numofpage <= 3)
+                                  ? numofpage
+                                  : 4, // Ensure we show a maximum of 3 pages
                               (index) {
-                                int pageNumber = (curpage <= 2)
-                                    ? index + 1
-                                    : curpage + index - 2;
+                                // Page number calculation: Always show 3 pages centered around the current page
+                                int pageNumber = curpage - 1 + index;
 
-                                if (curpage > numofpage - 2) {
-                                  pageNumber = numofpage - 3 + index;
+                                // Adjust the visible pages if we're near the start or end
+                                if (curpage == 1) {
+                                  pageNumber = index +
+                                      1; // Show 1, 2, 3 if we're at the beginning
+                                } else if (curpage == numofpage) {
+                                  pageNumber = numofpage -
+                                      2 +
+                                      index; // Show last 3 pages if we're at the end
                                 }
 
-                                return pageNumber > 0 && pageNumber <= numofpage
-                                    ? TextButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            curpage = pageNumber;
-                                            loadNewsData();
-                                          });
-                                        },
-                                        child: Text(
-                                          '$pageNumber',
-                                          style: TextStyle(
-                                            color: curpage == pageNumber
-                                                ? Colors.white
-                                                : Colors.white70,
-                                            fontWeight: curpage == pageNumber
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                          ),
-                                        ),
-                                      )
-                                    : const SizedBox.shrink();
+                                // Ensure the page number is within valid bounds
+                                if (pageNumber > 0 && pageNumber <= numofpage) {
+                                  return TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        curpage = pageNumber;
+                                        loadNewsDataWithDateRange(
+                                            page:
+                                                curpage); // Reload data on page change
+                                      });
+                                    },
+                                    child: Text(
+                                      '$pageNumber',
+                                      style: TextStyle(
+                                        color: curpage == pageNumber
+                                            ? Colors.white
+                                            : Colors.white70,
+                                        fontWeight: curpage == pageNumber
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox
+                                    .shrink(); // Return an empty widget if the page number is invalid
                               },
                             ),
                           ),
+
                           // Next Button
                           IconButton(
                             icon: const Icon(Icons.arrow_right,
@@ -312,7 +372,7 @@ class _NewsScreenState extends State<NewsScreen> {
                                 ? () {
                                     setState(() {
                                       curpage++;
-                                      loadNewsData();
+                                      loadNewsDataWithDateRange(page: curpage);
                                     });
                                   }
                                 : null,
@@ -365,6 +425,31 @@ class _NewsScreenState extends State<NewsScreen> {
         var data = jsonDecode(response.body);
         if (data['status'] == "success") {
           var result = data['data']['news'];
+          setState(() {
+            newsList.clear();
+            for (var item in result) {
+              News news = News.fromJson(item);
+              newsList.add(news);
+            }
+            numofpage = int.parse(data['numofpage'].toString());
+            numofresult = int.parse(data['numberofresult'].toString());
+          });
+        }
+      }
+    });
+  }
+
+  void loadNewsDataWithDateRange({int page = 1}) {
+    final url = Uri.parse(
+        "${Myconfig.servername}/mymemberlink_backend/load_news.php?pageno=$page&search=$searchQuery"
+        "&start_date=${startDate != null ? DateFormat('yyyy-MM-dd').format(startDate!) : ''}"
+        "&end_date=${endDate != null ? DateFormat('yyyy-MM-dd').format(endDate!) : ''}");
+
+    http.get(url).then((response) {
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        if (data['status'] == "success") {
+          var result = data['data']['news'];
           newsList.clear();
           for (var item in result) {
             News news = News.fromJson(item);
@@ -373,10 +458,46 @@ class _NewsScreenState extends State<NewsScreen> {
           setState(() {
             numofpage = int.parse(data['numofpage'].toString());
             numofresult = int.parse(data['numberofresult'].toString());
+            curpage = page; // Ensure current page is correctly updated
           });
         }
       }
     });
+  }
+
+  void showDateRangePickerDialog() async {
+    // Open the date picker for the start date
+    DateTime? selectedStartDate = await showDatePicker(
+      context: context,
+      initialDate: startDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (selectedStartDate != null) {
+      // If a start date is selected, set it
+      setState(() {
+        startDate = selectedStartDate;
+      });
+
+      // Open the date picker for the end date
+      DateTime? selectedEndDate = await showDatePicker(
+        context: context,
+        initialDate: endDate ?? DateTime.now(),
+        firstDate: selectedStartDate, // Ensure end date is after start date
+        lastDate: DateTime(2101),
+      );
+
+      if (selectedEndDate != null) {
+        // If an end date is selected, set it
+        setState(() {
+          endDate = selectedEndDate;
+        });
+
+        // Reload news data with the selected date range filter
+        loadNewsDataWithDateRange();
+      }
+    }
   }
 
   void showNewsDetailsDialog(int index) {
@@ -465,5 +586,16 @@ class _NewsScreenState extends State<NewsScreen> {
         }
       }
     });
+  }
+
+  void resetFilters() {
+    setState(() {
+      searchController.clear();
+      searchQuery = "";
+      startDate = null;
+      endDate = null;
+      curpage = 1; // Reset page to the first page
+    });
+    loadNewsData();
   }
 }

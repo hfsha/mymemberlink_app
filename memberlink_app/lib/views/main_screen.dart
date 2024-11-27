@@ -34,7 +34,22 @@ class _MainScreenState extends State<MainScreen> {
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Colors.purple,
+        backgroundColor:
+            Colors.transparent, // Make background transparent for gradient
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 142, 28, 177), // First color
+                Colors.purpleAccent, // Second color
+                Color.fromARGB(255, 245, 116, 174), // Third color
+              ],
+              begin: Alignment.topLeft, // Gradient starting position
+              end: Alignment.bottomRight, // Gradient ending position
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(
@@ -151,13 +166,12 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // Builds individual news items
   Widget _buildNewsItem(
       {required String title, required String date, required String details}) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(12),
