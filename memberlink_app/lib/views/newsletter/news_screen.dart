@@ -7,6 +7,7 @@ import 'package:memberlink_app/views/newsletter/edit_news.dart';
 import 'package:memberlink_app/views/newsletter/new_news.dart';
 import 'package:memberlink_app/views/shared/mydrawer.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -33,7 +34,7 @@ class _NewsScreenState extends State<NewsScreen> {
   void initState() {
     super.initState();
     loadNewsData();
-    favorites = List<bool>.filled(newsList.length, false);
+    _loadFavorites();
   }
 
   @override
@@ -276,7 +277,6 @@ class _NewsScreenState extends State<NewsScreen> {
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    // Heart icon that toggles between filled and unfilled
                                     IconButton(
                                       icon: Icon(
                                         favorites[index]
@@ -287,30 +287,23 @@ class _NewsScreenState extends State<NewsScreen> {
                                       ),
                                       onPressed: () {
                                         setState(() {
-                                          favorites[index] = !favorites[
-                                              index]; // Toggle the favorite state for this item
+                                          favorites[index] = !favorites[index];
                                         });
-
-                                        // Show the snackbar based on whether the heart is filled or not
+                                        _saveFavorites(); // Save the new favorite status
                                         ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              favorites[index]
-                                                  ? "Successfully added to favourites" // Success message when heart is filled
-                                                  : "News is removed from favourites", // Failure message when heart is unfilled
-                                              style: const TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                            backgroundColor: favorites[index]
-                                                ? Colors.green
-                                                : Colors
-                                                    .red, // Green for success, Red for failure
-                                            duration: const Duration(
-                                                seconds:
-                                                    2), // Duration for the snackbar to show
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                            favorites[index]
+                                                ? "Added to favorites"
+                                                : "Removed from favorites",
+                                            style: const TextStyle(
+                                                color: Colors.white),
                                           ),
-                                        );
+                                          backgroundColor: favorites[index]
+                                              ? Colors.green
+                                              : Colors.red,
+                                          duration: const Duration(seconds: 2),
+                                        ));
                                       },
                                     ),
                                     IconButton(
@@ -640,5 +633,28 @@ class _NewsScreenState extends State<NewsScreen> {
       curpage = 1; // Reset page to the first page
     });
     loadNewsData();
+  }
+
+  Future<void> _loadFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<bool> loadedFavorites = [];
+
+    // Loop through the newsList and load each favorite state
+    for (int i = 0; i < newsList.length; i++) {
+      loadedFavorites.add(prefs.getBool('favorite_$i') ??
+          false); // Default to false if not found
+    }
+
+    setState(() {
+      favorites = loadedFavorites; // Update the state with loaded favorites
+    });
+  }
+
+  // Save favorite status to SharedPreferences
+  Future<void> _saveFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (int i = 0; i < favorites.length; i++) {
+      prefs.setBool('favorite_$i', favorites[i]); // Save each favorite state
+    }
   }
 }
