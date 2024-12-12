@@ -1,18 +1,23 @@
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:memberlink_app/views/splash_screen.dart';
-// import 'package:firebase_core/firebase_core.dart';
+import 'package:memberlink_app/provider/cart_provider.dart'; // Import CartProvider
+import 'package:provider/provider.dart'; // Import provider
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
   EmailOTP.config(
     appName: 'MyMemberLink',
     otpType: OTPType.numeric,
     emailTheme: EmailTheme.v2,
     otpLength: 4,
   );
-  runApp(const MainApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => CartProvider(), // Provide CartProvider at the root
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {

@@ -6,23 +6,28 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:memberlink_app/models/myevent.dart';
 import 'package:memberlink_app/myconfig.dart';
+//import 'package:my_member_link/models/myevent.dart';
+//import 'package:my_member_link/myconfig.dart';
 
-class NewEventScreen extends StatefulWidget {
-  const NewEventScreen({super.key});
+class EditEventScreen extends StatefulWidget {
+  final MyEvent myevent;
+
+  const EditEventScreen({super.key, required this.myevent});
 
   @override
-  State<NewEventScreen> createState() => _NewEventScreenState();
+  State<EditEventScreen> createState() => _EditEventScreenState();
 }
 
-class _NewEventScreenState extends State<NewEventScreen> {
+class _EditEventScreenState extends State<EditEventScreen> {
   String startDateTime = "", endDateTime = "";
   String eventtypevalue = 'Conference';
   var selectedStartDateTime, selectedEndDateTime;
 
   var items = [
     'Conference',
-    'Exibition',
+    'Exhibition',
     'Seminar',
     'Hackathon',
   ];
@@ -36,35 +41,28 @@ class _NewEventScreenState extends State<NewEventScreen> {
   TextEditingController locationController = TextEditingController();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    titleController.text = widget.myevent.eventTitle.toString();
+    descriptionController.text = widget.myevent.eventDescription.toString();
+    locationController.text = widget.myevent.eventLocation.toString();
+    eventtypevalue = widget.myevent.eventType.toString();
+    var formatter = DateFormat('dd-MM-yyyy hh:mm a');
+    // String formattedDate = formatter.format(selectedStartDateTime);
+    startDateTime = formatter
+        .format(DateTime.parse(widget.myevent.eventStartdate.toString()));
+    endDateTime = formatter
+        .format(DateTime.parse(widget.myevent.eventEnddate.toString()));
+  }
+
+  @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
         appBar: AppBar(
-          title: const Text(
-            "New Event",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 142, 28, 177),
-                  Colors.purpleAccent,
-                  Color.fromARGB(255, 245, 116, 174),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
+          title: const Text("Edit Event"),
         ),
         body: SingleChildScrollView(
             padding: const EdgeInsets.all(8.0),
@@ -80,10 +78,10 @@ class _NewEventScreenState extends State<NewEventScreen> {
                       child: Container(
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                                fit: BoxFit.contain,
+                                fit: BoxFit.fill,
                                 image: _image == null
-                                    ? const AssetImage(
-                                        "assets/images/camera.png")
+                                    ? NetworkImage(
+                                        "${Myconfig.servername}/mymemberlink_backend/assets/events/${widget.myevent.eventFilename}")
                                     : FileImage(_image!) as ImageProvider),
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.grey.shade200,
@@ -95,21 +93,15 @@ class _NewEventScreenState extends State<NewEventScreen> {
                       height: 10,
                     ),
                     TextFormField(
-                      validator: (value) =>
-                          value!.isEmpty ? "Enter Title" : null,
-                      controller: titleController,
-                      decoration: InputDecoration(
-                        hintText: "Event Title",
-                        hintStyle: const TextStyle(color: Colors.black54),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                      ),
-                    ),
+                        validator: (value) =>
+                            value!.isEmpty ? "Enter Title" : null,
+                        controller: titleController,
+                        decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                            hintText: "Event Title")),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -118,15 +110,7 @@ class _NewEventScreenState extends State<NewEventScreen> {
                           child: Column(
                             children: [
                               const Text("Select Start Date"),
-                              Text(
-                                startDateTime,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight
-                                      .bold, // Added this line to make the text bold
-                                ),
-                              ),
+                              Text(startDateTime)
                             ],
                           ),
                           onTap: () {
@@ -149,13 +133,13 @@ class _NewEventScreenState extends State<NewEventScreen> {
                                       selectTime.hour,
                                       selectTime.minute,
                                     );
+                                    print(selectedStartDateTime.toString());
                                     var formatter =
                                         DateFormat('dd-MM-yyyy hh:mm a');
                                     String formattedDate =
                                         formatter.format(selectedStartDateTime);
-                                    setState(() {
-                                      startDateTime = formattedDate;
-                                    });
+                                    startDateTime = formattedDate.toString();
+                                    setState(() {});
                                   }
                                 });
                               }
@@ -166,14 +150,7 @@ class _NewEventScreenState extends State<NewEventScreen> {
                           child: Column(
                             children: [
                               const Text("Select End Date"),
-                              Text(
-                                endDateTime,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              Text(endDateTime)
                             ],
                           ),
                           onTap: () {
@@ -200,42 +177,40 @@ class _NewEventScreenState extends State<NewEventScreen> {
                                         DateFormat('dd-MM-yyyy hh:mm a');
                                     String formattedDate =
                                         formatter.format(selectedEndDateTime);
-                                    setState(() {
-                                      endDateTime = formattedDate;
-                                    });
+                                    endDateTime = formattedDate.toString();
+                                    print(endDateTime);
+                                    setState(() {});
                                   }
                                 });
                               }
                             });
                           },
-                        ),
+                        )
                       ],
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
-                      validator: (value) =>
-                          value!.isEmpty ? "Enter Location" : null,
-                      controller: locationController,
-                      decoration: InputDecoration(
-                        hintText: "Event Location",
-                        hintStyle: const TextStyle(color: Colors.black54),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                      ),
-                    ),
+                        validator: (value) =>
+                            value!.isEmpty ? "Enter Location" : null,
+                        controller: locationController,
+                        decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                            hintText: "Event Location")),
                     const SizedBox(height: 10),
                     DropdownButtonFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
-                        filled: true,
-                        fillColor: Colors.white,
+                        labelStyle: TextStyle(
+                            // fontSize: resWidth * 0.04,
+                            ),
+                        // icon: Icon(
+                        //   Icons.people,
+                        // ),
                       ),
                       value: eventtypevalue,
                       icon: const Icon(Icons.keyboard_arrow_down),
@@ -249,22 +224,16 @@ class _NewEventScreenState extends State<NewEventScreen> {
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
-                      validator: (value) =>
-                          value!.isEmpty ? "Enter Description" : null,
-                      controller: descriptionController,
-                      maxLines: 10,
-                      decoration: InputDecoration(
-                        hintText: "Event Description",
-                        hintStyle: const TextStyle(color: Colors.black54),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                      ),
-                    ),
+                        validator: (value) =>
+                            value!.isEmpty ? "Enter Description" : null,
+                        controller: descriptionController,
+                        maxLines: 10,
+                        decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                            ),
+                            hintText: "Event Description")),
                     const SizedBox(height: 10),
                     MaterialButton(
                       elevation: 10,
@@ -273,26 +242,19 @@ class _NewEventScreenState extends State<NewEventScreen> {
                           print("STILL HERE");
                           return;
                         }
-                        if (_image == null) {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(
-                            content: Text("Please take a photo"),
-                            backgroundColor: Colors.red,
-                          ));
-                          return;
-                        }
-                        double filesize = getFileSize(_image!);
-                        print(filesize);
+                        if (_image != null) {
+                          double filesize = getFileSize(_image!);
+                          print(filesize);
 
-                        if (filesize > 100) {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(
-                            content: Text("Image size too large"),
-                            backgroundColor: Colors.red,
-                          ));
-                          return;
+                          if (filesize > 100) {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text("Image size too large"),
+                              backgroundColor: Colors.red,
+                            ));
+                            return;
+                          }
                         }
-
                         if (startDateTime == "" || endDateTime == "") {
                           ScaffoldMessenger.of(context)
                               .showSnackBar(const SnackBar(
@@ -302,15 +264,19 @@ class _NewEventScreenState extends State<NewEventScreen> {
                           return;
                         }
 
-                        insertEventDialog();
+                        updateEventDialog();
                       },
                       minWidth: screenWidth,
                       height: 50,
-                      color: const Color.fromARGB(255, 209, 57, 235),
-                      child: const Text(
-                        "Insert",
+                      color: Theme.of(context)
+                          .colorScheme
+                          .secondary, // Uses primary color from theme
+                      child: Text(
+                        "Update",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSecondary, // Text color matches onPrimary color
                         ),
                       ),
                     ),
@@ -324,62 +290,38 @@ class _NewEventScreenState extends State<NewEventScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        // return object of type Dialog
         return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          title: const Center(
-            child: Text(
+            title: const Text(
               "Select from",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+              style: TextStyle(),
             ),
-          ),
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: const Color.fromARGB(255, 215, 73, 194),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      fixedSize: Size(screenWidth / 4, screenHeight / 8)),
+                  child: const Text('Gallery'),
+                  onPressed: () => {
+                    Navigator.of(context).pop(),
+                    _selectfromGallery(),
+                  },
                 ),
-                icon: const Icon(Icons.photo, size: 24),
-                label: const Text('Gallery'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _selectfromGallery();
-                },
-              ),
-              const SizedBox(width: 8),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.purple,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                const SizedBox(
+                  width: 8,
                 ),
-                icon: const Icon(Icons.camera_alt, size: 24),
-                label: const Text('Camera'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _selectFromCamera();
-                },
-              ),
-            ],
-          ),
-        );
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      fixedSize: Size(screenWidth / 4, screenHeight / 8)),
+                  child: const Text('Camera'),
+                  onPressed: () => {
+                    Navigator.of(context).pop(),
+                    _selectFromCamera(),
+                  },
+                ),
+              ],
+            ));
       },
     );
   }
@@ -391,10 +333,13 @@ class _NewEventScreenState extends State<NewEventScreen> {
       maxHeight: 800,
       maxWidth: 800,
     );
-
+    // print("BEFORE CROP: ");
+    // print(getFileSize(_image!));
     if (pickedFile != null) {
       _image = File(pickedFile.path);
-
+      // setState(() {
+      //   _image = File(pickedFile.path);
+      // });
       cropImage();
     } else {}
   }
@@ -406,20 +351,15 @@ class _NewEventScreenState extends State<NewEventScreen> {
       maxHeight: 800,
       maxWidth: 800,
     );
-
     print("BEFORE CROP: ");
     print(getFileSize(_image!));
     if (pickedFile != null) {
       _image = File(pickedFile.path);
-
-      // Safe to call getFileSize now, since _image is not null
-      print("BEFORE CROP: ");
-      print(getFileSize(_image!));
-
+      // setState(() {
+      //   _image = File(pickedFile.path);
+      // });
       cropImage();
-    } else {
-      print("No image selected.");
-    }
+    } else {}
   }
 
   Future<void> cropImage() async {
@@ -452,13 +392,14 @@ class _NewEventScreenState extends State<NewEventScreen> {
     return sizeInKB;
   }
 
-  void insertEventDialog() {
+  void updateEventDialog() {
     showDialog(
         context: context,
         builder: (BuildContext context) {
+          // return object of type Dialog
           return AlertDialog(
             title: const Text(
-              "Insert Event",
+              "Update Event",
               style: TextStyle(),
             ),
             content: const Text("Are you sure?", style: TextStyle()),
@@ -469,7 +410,7 @@ class _NewEventScreenState extends State<NewEventScreen> {
                   style: TextStyle(),
                 ),
                 onPressed: () {
-                  insertEvent();
+                  updateEvent();
                   Navigator.of(context).pop();
                 },
               ),
@@ -485,35 +426,43 @@ class _NewEventScreenState extends State<NewEventScreen> {
         });
   }
 
-  void insertEvent() async {
+  void updateEvent() {
+    String image;
     String title = titleController.text;
     String location = locationController.text;
     String description = descriptionController.text;
     String start = selectedStartDateTime.toString();
     String end = selectedEndDateTime.toString();
-    String image = base64Encode(_image!.readAsBytesSync());
+    if (_image == null) {
+      image = "NA";
+    } else {
+      image = base64Encode(_image!.readAsBytesSync());
+    }
 
-    try {
-      final response = await http.post(
+    if (start == "null") {
+      start = "NA";
+    }
+    if (end == "null") {
+      end = "NA";
+    }
+    // log(image);
+    http.post(
         Uri.parse(
-            "${Myconfig.servername}/mymemberlink_backend/insert_event.php"),
+            "${Myconfig.servername}/mymemberlink_backend/update_event.php"),
         body: {
+          "eventid": widget.myevent.eventId.toString(),
           "title": title,
           "location": location,
           "description": description,
           "eventtype": eventtypevalue,
           "start": start,
           "end": end,
-          "image": image,
-        },
-      );
-
-      // Debugging response
-      print("Raw response: ${response.body}");
-
+          "filename": widget.myevent.eventFilename,
+          "image": image
+        }).then((response) {
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-
+        //  log(response.body);
         if (data['status'] == "success") {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -521,26 +470,12 @@ class _NewEventScreenState extends State<NewEventScreen> {
             backgroundColor: Colors.green,
           ));
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Insert Failed: ${data['data']}"),
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Insert Failed"),
             backgroundColor: Colors.red,
           ));
         }
-      } else {
-        // Handle HTTP status codes other than 200
-        print("HTTP Error: ${response.statusCode}");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Server Error: ${response.statusCode}"),
-          backgroundColor: Colors.red,
-        ));
       }
-    } catch (e) {
-      // Catch and display exceptions (e.g., network issues)
-      print("Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Unexpected Error: $e"),
-        backgroundColor: Colors.red,
-      ));
-    }
+    });
   }
 }

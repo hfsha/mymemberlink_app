@@ -103,8 +103,7 @@ class _NewsScreenState extends State<NewsScreen> {
                             color: Color.fromARGB(255, 40, 39, 39),
                           ),
                           suffixIcon: Row(
-                            mainAxisSize: MainAxisSize
-                                .min, // Ensures the icons don't expand too much
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               if (searchQuery.isNotEmpty)
                                 IconButton(
