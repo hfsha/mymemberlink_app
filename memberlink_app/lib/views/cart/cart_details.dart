@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memberlink_app/models/cart_item.dart';
 import 'package:memberlink_app/myconfig.dart';
 import 'package:memberlink_app/provider/cart_provider.dart';
+import 'package:memberlink_app/views/products/product_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -28,7 +29,17 @@ class _CartDetailsState extends State<CartDetails> {
                 width: MediaQuery.of(context).size.width,
                 height: 500,
                 padding: const EdgeInsets.all(10),
-                color: Theme.of(context).colorScheme.primary,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 245, 116, 174), // Start color
+                      Colors.purpleAccent, // Middle color
+                      Color.fromARGB(255, 245, 116, 196), // End color
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
                 child: Column(
                   children: [
                     SizedBox(
@@ -38,7 +49,12 @@ class _CartDetailsState extends State<CartDetails> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ProductScreen()),
+                                );
                               },
                               child: const Icon(
                                 Icons.arrow_back_ios_new_outlined,
@@ -82,6 +98,7 @@ class _CartDetailsState extends State<CartDetails> {
                   ],
                 ),
               ),
+
               Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
@@ -106,7 +123,7 @@ class _CartDetailsState extends State<CartDetails> {
                             return Center(
                               child: Text(
                                 "Your Cart is empty.",
-                                style: Theme.of(context).textTheme.titleLarge,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                             );
                           }
@@ -141,7 +158,7 @@ class _CartDetailsState extends State<CartDetails> {
                                         errorBuilder:
                                             (context, error, stackTrace) =>
                                                 Image.asset(
-                                          "assets/images/na.png", // Fallback image
+                                          "assets/images/na.png",
                                           fit: BoxFit.cover,
                                         ),
                                         width: 50,
@@ -159,10 +176,54 @@ class _CartDetailsState extends State<CartDetails> {
                                         IconButton(
                                           icon: const Icon(Icons.remove),
                                           onPressed: () {
-                                            cartProvider
-                                                .decreaseCartItemQuantity(
-                                                    index);
+                                            if (cartItem.quantity == 1) {
+                                              // Show confirmation dialog
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: const Text(
+                                                        "Remove Product"),
+                                                    content: const Text(
+                                                        "Do you want to remove this product?"),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop(); // Close the dialog
+                                                        },
+                                                        child: const Text("No"),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          cartProvider
+                                                              .removeCartItem(
+                                                                  index);
+                                                          Navigator.of(context)
+                                                              .pop(); // Close the dialog
+                                                        },
+                                                        child:
+                                                            const Text("Yes"),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            } else {
+                                              cartProvider
+                                                  .decreaseCartItemQuantity(
+                                                      index);
+                                            }
                                           },
+                                        ),
+                                        Text(
+                                          cartItem.quantity
+                                              .toString(), //quantity
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.add),
@@ -196,8 +257,8 @@ class _CartDetailsState extends State<CartDetails> {
                                       cartProvider.clearCart();
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          Theme.of(context).colorScheme.primary,
+                                      backgroundColor: const Color.fromARGB(
+                                          255, 245, 116, 193),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(30),
                                       ),
@@ -210,7 +271,7 @@ class _CartDetailsState extends State<CartDetails> {
                                 ],
                               ),
                               const Divider(color: Colors.grey),
-                              const SizedBox(height: 5),
+                              const SizedBox(height: 7),
                               Row(
                                 children: [
                                   Text(
@@ -245,8 +306,8 @@ class _CartDetailsState extends State<CartDetails> {
                                     cartProvider.clearCart();
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.primary,
+                                    backgroundColor: const Color.fromARGB(
+                                        255, 245, 116, 193),
                                     elevation: 10,
                                   ),
                                   child: const Text(
@@ -258,7 +319,7 @@ class _CartDetailsState extends State<CartDetails> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 20),
                             ],
                           ),
                         );

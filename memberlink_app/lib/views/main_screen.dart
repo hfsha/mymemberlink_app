@@ -34,8 +34,7 @@ class _MainScreenState extends State<MainScreen> {
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor:
-            Colors.transparent, // Make background transparent for gradient
+        backgroundColor: Colors.transparent,
         elevation: 0,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -82,7 +81,7 @@ class _MainScreenState extends State<MainScreen> {
               child: Column(
                 children: [
                   const Text(
-                    'Welcome to Memberlink!',
+                    'Welcome , Shahidatul!',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,

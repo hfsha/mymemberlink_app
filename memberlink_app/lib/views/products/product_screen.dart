@@ -259,7 +259,8 @@ class _ProductScreenState extends State<ProductScreen> {
                                       onPressed: () => addToCart(index),
                                       icon: const Icon(
                                         Icons.shopping_cart,
-                                        color: Colors.purpleAccent,
+                                        color:
+                                            Color.fromARGB(255, 176, 50, 198),
                                       ),
                                     ),
                                   ],
@@ -364,45 +365,171 @@ class _ProductScreenState extends State<ProductScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-              productList[index].productName?.toString() ?? "Unnamed Product"),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                Image.network(
-                  "${Myconfig.servername}/mymemberlink_backend/assets/products/${productList[index].productFilename}",
-                  errorBuilder: (context, error, stackTrace) =>
-                      Image.asset("assets/images/na.png"),
-                  width: screenWidth,
-                  height: screenHeight / 4,
-                  fit: BoxFit.cover,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  "Price: RM ${productList[index].productPrice?.toStringAsFixed(2) ?? 'N/A'}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                Text(
-                    "Quantity: ${productList[index].productQuantity ?? 'N/A'}"),
-                const SizedBox(height: 10),
-                Text(
-                  productList[index].productDesc?.toString() ??
-                      "No Description Available",
-                  textAlign: TextAlign.justify,
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Close"),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Product Image
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      "${Myconfig.servername}/mymemberlink_backend/assets/products/${productList[index].productFilename}",
+                      errorBuilder: (context, error, stackTrace) =>
+                          Image.asset("assets/images/na.png"),
+                      width: double.infinity,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Text(
+                    productList[index].productName?.toString() ??
+                        "Unnamed Product",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Divider
+                  Divider(
+                    thickness: 1,
+                    color: Colors.grey.shade300,
+                  ),
+                  const SizedBox(height: 16),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Price",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          Text(
+                            "RM ${productList[index].productPrice?.toStringAsFixed(2) ?? 'N/A'}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Quantity",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          Text(
+                            "${productList[index].productQuantity ?? 'N/A'}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  Text(
+                    "Description",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    productList[index].productDesc?.toString() ??
+                        "No Description Available",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      height: 1.5,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(height: 24),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          side: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        child: const Text(
+                          "Close",
+                          style: TextStyle(color: Colors.black87),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        onPressed: () {
+                          addToCart(index); // Add to Cart function
+                          Navigator.pop(context); // Close the dialog
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromARGB(255, 135, 28, 133),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text(
+                          "Add to Cart",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         );
       },
     );
