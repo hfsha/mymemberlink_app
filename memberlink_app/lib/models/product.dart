@@ -41,18 +41,6 @@ class Product {
     productDate = json['product_date'];
   }
 
-  // get id => null;
-
-  // get price => null;
-
-  // get title => null;
-
-  // Null get imagePath => null;
-
-  //String get image => null;
-
-  //String get image => null;
-
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['product_id'] = productId;

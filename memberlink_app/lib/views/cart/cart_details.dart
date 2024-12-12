@@ -182,31 +182,166 @@ class _CartDetailsState extends State<CartDetails> {
                                                 context: context,
                                                 builder:
                                                     (BuildContext context) {
-                                                  return AlertDialog(
-                                                    title: const Text(
-                                                        "Remove Product"),
-                                                    content: const Text(
-                                                        "Do you want to remove this product?"),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop(); // Close the dialog
-                                                        },
-                                                        child: const Text("No"),
+                                                  return Dialog(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              16),
+                                                    ),
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              16),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(16),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.1),
+                                                            blurRadius: 8,
+                                                            offset:
+                                                                const Offset(
+                                                                    0, 4),
+                                                          ),
+                                                        ],
                                                       ),
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          cartProvider
-                                                              .removeCartItem(
-                                                                  index);
-                                                          Navigator.of(context)
-                                                              .pop(); // Close the dialog
-                                                        },
-                                                        child:
-                                                            const Text("Yes"),
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          // Title
+                                                          Text(
+                                                            "Remove Product",
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 20,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: Colors
+                                                                  .black87,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 8),
+                                                          Divider(
+                                                            thickness: 1,
+                                                            color: Colors
+                                                                .grey.shade300,
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 16),
+
+                                                          // Content
+                                                          const Text(
+                                                            "Do you want to remove this product?",
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              color: Colors
+                                                                  .black87,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 24),
+
+                                                          // Actions
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              OutlinedButton(
+                                                                onPressed: () =>
+                                                                    Navigator.pop(
+                                                                        context),
+                                                                style: OutlinedButton
+                                                                    .styleFrom(
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(8),
+                                                                  ),
+                                                                  side: BorderSide(
+                                                                      color: Colors
+                                                                          .grey
+                                                                          .shade300),
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .symmetric(
+                                                                    horizontal:
+                                                                        20,
+                                                                    vertical:
+                                                                        12,
+                                                                  ),
+                                                                ),
+                                                                child:
+                                                                    const Text(
+                                                                  "No",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: Colors
+                                                                        .black87,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              const SizedBox(
+                                                                  width: 12),
+                                                              ElevatedButton(
+                                                                onPressed: () {
+                                                                  cartProvider
+                                                                      .removeCartItem(
+                                                                          index);
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                style: ElevatedButton
+                                                                    .styleFrom(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .red,
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(8),
+                                                                  ),
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .symmetric(
+                                                                    horizontal:
+                                                                        20,
+                                                                    vertical:
+                                                                        12,
+                                                                  ),
+                                                                ),
+                                                                child:
+                                                                    const Text(
+                                                                  "Yes",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
                                                       ),
-                                                    ],
+                                                    ),
                                                   );
                                                 },
                                               );
