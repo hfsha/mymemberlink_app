@@ -24,6 +24,7 @@ class _ProductScreenState extends State<ProductScreen> {
   List<Product> productList = [];
   late double screenWidth, screenHeight;
   final DateFormat df = DateFormat('dd/MM/yyyy');
+  String searchQuery = "";
   String status = "Loading...";
   int currentPage = 1;
   bool isLoadingMore = false;
@@ -96,7 +97,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     return cartProvider.cartCount > 0
                         ? Container(
                             padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.red,
                               shape: BoxShape.circle,
                             ),
@@ -116,162 +117,191 @@ class _ProductScreenState extends State<ProductScreen> {
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 245, 235, 250),
-              Color.fromARGB(255, 230, 211, 240),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: productList.isEmpty
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      "assets/images/na.png",
-                      height: screenHeight * 0.3,
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      "No products found",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const NewProductScreen(),
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purpleAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text("Add New Product"),
-                    ),
-                  ],
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value.toLowerCase();
+                });
+              },
+              decoration: InputDecoration(
+                hintText: "Search products...",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              )
-            : NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification scrollInfo) {
-                  if (!isLoadingMore &&
-                      scrollInfo.metrics.pixels ==
-                          scrollInfo.metrics.maxScrollExtent) {
-                    loadMoreProducts();
-                  }
-                  return true;
-                },
-                child: GridView.builder(
-                    padding: const EdgeInsets.all(16),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.8,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                    ),
-                    itemCount: productList.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == productList.length) {
-                        return isLoadingMore
-                            ? const Center(child: CircularProgressIndicator())
-                            : const SizedBox.shrink();
-                      }
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 245, 235, 250),
+                    Color.fromARGB(255, 230, 211, 240),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: productList.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/images/na.png",
+                            height: screenHeight * 0.3,
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            "No products found",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          ElevatedButton(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NewProductScreen(),
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.purpleAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Text("Add New Product"),
+                          ),
+                        ],
+                      ),
+                    )
+                  : NotificationListener<ScrollNotification>(
+                      onNotification: (ScrollNotification scrollInfo) {
+                        if (!isLoadingMore &&
+                            scrollInfo.metrics.pixels ==
+                                scrollInfo.metrics.maxScrollExtent) {
+                          loadMoreProducts();
+                        }
+                        return true;
+                      },
+                      child: GridView.builder(
+                          padding: const EdgeInsets.all(16),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.8,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                          ),
+                          itemCount: filteredProducts().length + 1,
+                          itemBuilder: (context, index) {
+                            if (index == filteredProducts().length) {
+                              return isLoadingMore
+                                  ? const Center(
+                                      child: CircularProgressIndicator())
+                                  : const SizedBox.shrink();
+                            }
 
-                      return Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        elevation: 5,
-                        child: InkWell(
-                          onTap: () => showProductDetailsDialog(index),
-                          onLongPress: () => deleteDialog(index),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(15),
-                                  child: Image.network(
-                                    "${Myconfig.servername}/mymemberlink_backend/assets/products/${productList[index].productFilename}",
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            Image.asset(
-                                      "assets/images/na.png",
-                                      fit: BoxFit.cover,
-                                    ),
-                                    height: 110,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
+                            return Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              elevation: 5,
+                              child: InkWell(
+                                onTap: () => showProductDetailsDialog(index),
+                                onLongPress: () => deleteDialog(index),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(15),
+                                        child: Image.network(
+                                          "${Myconfig.servername}/mymemberlink_backend/assets/products/${filteredProducts()[index].productFilename}",
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  Image.asset(
+                                            "assets/images/na.png",
+                                            fit: BoxFit.cover,
+                                          ),
+                                          height: 110,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            productList[index].productName ??
-                                                "Unnamed Product",
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              overflow: TextOverflow.ellipsis,
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  filteredProducts()[index]
+                                                          .productName ??
+                                                      "Unnamed Product",
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  maxLines: 1,
+                                                ),
+                                                const SizedBox(height: 3),
+                                                Text(
+                                                  "RM ${filteredProducts()[index].productPrice?.toStringAsFixed(2) ?? 'N/A'}",
+                                                  style: const TextStyle(
+                                                    color: Color.fromARGB(
+                                                        255, 171, 47, 193),
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  "Quantity: ${filteredProducts()[index].productQuantity ?? 'N/A'}",
+                                                  style: const TextStyle(
+                                                      fontSize: 12),
+                                                ),
+                                              ],
                                             ),
-                                            maxLines: 1,
                                           ),
-                                          const SizedBox(height: 3),
-                                          Text(
-                                            "RM ${productList[index].productPrice?.toStringAsFixed(2) ?? 'N/A'}",
-                                            style: const TextStyle(
+                                          IconButton(
+                                            onPressed: () => addToCart(index),
+                                            icon: const Icon(
+                                              Icons.shopping_cart,
                                               color: Color.fromARGB(
-                                                  255, 171, 47, 193),
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
+                                                  255, 176, 50, 198),
                                             ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            "Quantity: ${productList[index].productQuantity ?? 'N/A'}",
-                                            style:
-                                                const TextStyle(fontSize: 12),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    IconButton(
-                                      onPressed: () => addToCart(index),
-                                      icon: const Icon(
-                                        Icons.shopping_cart,
-                                        color:
-                                            Color.fromARGB(255, 176, 50, 198),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-              ),
+                              ),
+                            );
+                          }),
+                    ),
+            ),
+          ),
+        ],
       ),
       drawer: const MyDrawer(),
       floatingActionButton: FloatingActionButton(
@@ -285,6 +315,16 @@ class _ProductScreenState extends State<ProductScreen> {
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
+  }
+
+  List<Product> filteredProducts() {
+    if (searchQuery.isEmpty) {
+      return productList;
+    }
+    return productList
+        .where((product) =>
+            product.productName?.toLowerCase().contains(searchQuery) ?? false)
+        .toList();
   }
 
   void loadProductData() {
@@ -578,9 +618,9 @@ class _ProductScreenState extends State<ProductScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Title
-                Text(
+                const Text(
                   "Delete Product",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,

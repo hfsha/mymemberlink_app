@@ -536,41 +536,114 @@ class _NewsScreenState extends State<NewsScreen> {
   }
 
   void showNewsDetailsDialog(int index) {
+    final news = newsList[index];
+
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(20), // Modern rounded edges
           ),
-          title: Text(newsList[index].newsTitle.toString(),
-              style: const TextStyle(color: Colors.purple)),
-          content: Text(newsList[index].newsDetails.toString(),
-              textAlign: TextAlign.justify),
+          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+          contentPadding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.article_outlined,
+                    color: Colors.purple,
+                    size: 28,
+                  ),
+                  const SizedBox(width: 12), // Gap between icon and title
+                  Expanded(
+                    child: Text(
+                      news.newsTitle ?? "Untitled News",
+                      style: const TextStyle(
+                        color: Colors.purple,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8), // Small gap below the title
+              const Divider(
+                thickness: 1,
+                color: Colors.grey,
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8.0), // Adds space at the top
+              child: Text(
+                news.newsDetails ?? "Details are not available for this news.",
+                textAlign: TextAlign.justify,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black87,
+                  height: 1.5, // Improves line spacing for readability
+                ),
+              ),
+            ),
+          ),
           actions: [
-            TextButton(
+            ElevatedButton.icon(
               onPressed: () async {
-                Navigator.pop(context);
+                Navigator.pop(context); // Close dialog before navigating
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (content) =>
-                          EditNewsScreen(news: newsList[index])),
+                    builder: (context) => EditNewsScreen(news: news),
+                  ),
                 );
-                loadNewsData();
+                loadNewsData(); // Refresh data after returning
               },
-              child: const Text("Edit",
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.purple,
-                      fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              ),
+              icon: const Icon(Icons.edit, size: 18, color: Colors.white),
+              label: const Text(
+                "Edit",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ),
-            TextButton(
+            OutlinedButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context); // Close dialog
               },
-              child: const Text("Close",
-                  style: TextStyle(fontSize: 16, color: Colors.purple)),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.purple,
+                side: const BorderSide(color: Colors.purple),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              ),
+              child: const Text(
+                "Close",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );

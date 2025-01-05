@@ -8,8 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:memberlink_app/models/myevent.dart';
 import 'package:memberlink_app/myconfig.dart';
-//import 'package:my_member_link/models/myevent.dart';
-//import 'package:my_member_link/myconfig.dart';
 
 class EditEventScreen extends StatefulWidget {
   final MyEvent myevent;

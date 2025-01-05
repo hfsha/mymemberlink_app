@@ -32,7 +32,7 @@ class Product {
     productDesc = json['product_desc'];
     productQuantity = json['product_quantity'] != null
         ? int.tryParse(json['product_quantity'].toString())
-        : null; // Parse as int
+        : null;
 
     productPrice = json['product_price'] != null
         ? double.tryParse(json['product_price'].toString())
