@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:memberlink_app/models/product.dart';
+import 'package:memberlink_app/models/user.dart';
 import 'package:memberlink_app/myconfig.dart';
 import 'package:http/http.dart' as http;
 import 'package:memberlink_app/provider/cart_provider.dart';
@@ -14,7 +15,8 @@ import 'package:memberlink_app/views/shared/mydrawer.dart';
 import 'package:provider/provider.dart';
 
 class ProductScreen extends StatefulWidget {
-  const ProductScreen({super.key});
+  final User user;
+  const ProductScreen({super.key, required this.user});
 
   @override
   State<ProductScreen> createState() => _ProductScreenState();
@@ -84,7 +86,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const CartDetails()),
+                        builder: (context) => CartDetails(user: widget.user)),
                   );
                 },
                 icon: const Icon(Icons.shopping_cart),
@@ -303,7 +305,7 @@ class _ProductScreenState extends State<ProductScreen> {
           ),
         ],
       ),
-      drawer: const MyDrawer(),
+      drawer: MyDrawer(user: widget.user),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(

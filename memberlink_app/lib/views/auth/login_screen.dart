@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:memberlink_app/models/user.dart';
 import 'package:memberlink_app/myconfig.dart';
 import 'package:memberlink_app/views/auth/forgotpass_screen.dart';
 //import 'package:memberlink_app/views/events/event_screen.dart';
@@ -206,25 +207,66 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     http.post(
-        Uri.parse("${Myconfig.servername}/mymemberlink_backend/login.php"),
-        body: {"email": email, "password": password}).then((response) {
+      Uri.parse("${Myconfig.servername}/mymemberlink_backend/login.php"),
+      body: {"email": email, "password": password},
+    ).then((response) {
+      debugPrint("Status Code: ${response.statusCode}");
+      debugPrint("Response: ${response.body}");
+
       if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-        if (data['status'] == "success") {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Login Success"),
-            backgroundColor: Colors.green,
-          ));
-          Navigator.push(context,
-              MaterialPageRoute(builder: (content) => const MainScreen()));
-          //MaterialPageRoute(builder: (content) => const EventScreen()));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Login Failed"),
+        try {
+          // Decode the JSON response
+          var data = jsonDecode(response.body);
+
+          // Check the status of the login attempt
+          if (data['status'] == "success") {
+            // Create a User object from the response data
+            User user = User.fromJson(data['data']);
+
+            // Optionally, save the user data to SharedPreferences for persistence
+            SharedPreferences.getInstance().then((prefs) {
+              prefs.setString('userid', user.userId ?? "");
+              prefs.setString('email', user.email ?? "");
+            });
+
+            // Show success message and navigate to the MainScreen
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Login Success"),
+              backgroundColor: Colors.green,
+            ));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (content) => MainScreen(user: user)),
+            );
+          } else {
+            // If login fails, show an error message
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(data['message'] ?? "Login Failed"),
+              backgroundColor: Colors.red,
+            ));
+          }
+        } catch (e) {
+          // Handle JSON parsing errors
+          debugPrint("JSON Error: $e");
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Error processing response: $e"),
             backgroundColor: Colors.red,
           ));
         }
+      } else {
+        // Handle server error (non-200 status code)
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Server Error: ${response.statusCode}"),
+          backgroundColor: Colors.red,
+        ));
       }
+    }).catchError((error) {
+      // Handle network or other errors
+      debugPrint("Network Error: $error");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Network Error: $error"),
+        backgroundColor: Colors.red,
+      ));
     });
   }
 

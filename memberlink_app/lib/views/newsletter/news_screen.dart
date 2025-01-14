@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:memberlink_app/models/news.dart';
+import 'package:memberlink_app/models/user.dart';
 import 'package:memberlink_app/myconfig.dart';
 import 'package:memberlink_app/views/newsletter/edit_news.dart';
 import 'package:memberlink_app/views/newsletter/new_news.dart';
@@ -10,7 +11,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NewsScreen extends StatefulWidget {
-  const NewsScreen({super.key});
+  final User user;
+  const NewsScreen({super.key, required this.user});
 
   @override
   State<NewsScreen> createState() => _NewsScreenState();
@@ -439,7 +441,7 @@ class _NewsScreenState extends State<NewsScreen> {
                 ),
               ],
             ),
-      drawer: const MyDrawer(),
+      drawer: MyDrawer(user: widget.user),
     );
   }
 

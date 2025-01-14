@@ -1,26 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:memberlink_app/models/payment.dart';
+import 'package:memberlink_app/models/user.dart';
 import 'package:memberlink_app/views/auth/login_screen.dart';
 import 'package:memberlink_app/views/cart/cart_details.dart';
 import 'package:memberlink_app/views/events/event_screen.dart';
 import 'package:memberlink_app/views/main_screen.dart';
+import 'package:memberlink_app/views/memberships/membership_history_screen.dart';
+import 'package:memberlink_app/views/memberships/membership_screen.dart';
+import 'package:memberlink_app/views/memberships/try.dart';
 import 'package:memberlink_app/views/newsletter/news_screen.dart';
 import 'package:memberlink_app/views/products/product_screen.dart';
 
 class MyDrawer extends StatelessWidget {
-  const MyDrawer({super.key});
+  final User user;
+  // final Payment payment;
+  const MyDrawer({super.key, required this.user});
+
+  // get user => null;
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         children: [
-          const UserAccountsDrawerHeader(
-            decoration: BoxDecoration(
+          UserAccountsDrawerHeader(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
                   Color.fromARGB(255, 155, 35, 192),
                   //Color.fromARGB(255, 190, 55, 213),
-                  Color.fromARGB(255, 236, 53, 239),
+                  Color.fromARGB(255, 185, 32, 191),
                   //Color.fromARGB(255, 245, 116, 213),
                 ],
                 begin: Alignment.topLeft,
@@ -28,16 +37,17 @@ class MyDrawer extends StatelessWidget {
               ),
             ),
             accountName: Text(
-              'Shahidatul Hidayah',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              user.fullName ??
+                  'User Name', // Use user's full name with fallback
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             accountEmail: Text(
-              'hfshahidatul.uum@gmail.com',
-              style: TextStyle(fontSize: 14),
+              user.email ?? 'Email', // Use user's email with fallback
+              style: const TextStyle(fontSize: 14),
             ),
-            currentAccountPicture: CircleAvatar(
+            currentAccountPicture: const CircleAvatar(
               backgroundImage: AssetImage(
-                  'assets/images/profile_picture.png'), // Add your profile image here
+                  'assets/images/profile_picture.jpg'), // Add your profile image here
             ),
           ),
           ListTile(
@@ -49,7 +59,7 @@ class MyDrawer extends StatelessWidget {
                 context,
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      const MainScreen(),
+                      MainScreen(user: user),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
                     const begin = Offset(1.0, 0.0); // Slide in from the right
@@ -76,7 +86,7 @@ class MyDrawer extends StatelessWidget {
                 context,
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      const NewsScreen(),
+                      NewsScreen(user: user),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
                     const begin = Offset(1.0, 0.0); // Slide in from the right
@@ -103,7 +113,7 @@ class MyDrawer extends StatelessWidget {
                 context,
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      const EventScreen(),
+                      EventScreen(user: user),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
                     const begin = Offset(1.0, 0.0); // Slide in from the right
@@ -123,7 +133,8 @@ class MyDrawer extends StatelessWidget {
           ),
           const Divider(color: Colors.grey),
           ListTile(
-            leading: const Icon(Icons.shop_2_sharp, color: Colors.purple),
+            leading:
+                const Icon(Icons.shopping_bag_outlined, color: Colors.purple),
             title: const Text("Products"),
             onTap: () {
               Navigator.pop(context);
@@ -131,7 +142,7 @@ class MyDrawer extends StatelessWidget {
                 context,
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      const ProductScreen(),
+                      ProductScreen(user: user),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
                     const begin = Offset(1.0, 0.0); // Slide in from the right
@@ -158,7 +169,62 @@ class MyDrawer extends StatelessWidget {
                 context,
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) => //
-                      const CartDetails(),
+                      CartDetails(user: user),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(1.0, 0.0); // Slide in from the right
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+                    var offsetAnimation = animation.drive(tween);
+                    return SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+          const Divider(color: Colors.grey),
+          ListTile(
+            leading: const Icon(Icons.card_membership, color: Colors.purple),
+            title: const Text("Memberships"),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => //
+                      MembershipScreen(user: user),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(1.0, 0.0); // Slide in from the right
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+                    var offsetAnimation = animation.drive(tween);
+                    return SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.history, color: Colors.purple),
+            title: const Text("Transactions history"),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => //
+                      MembershipHistoryScreen(user: user),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
                     const begin = Offset(1.0, 0.0); // Slide in from the right
@@ -181,10 +247,39 @@ class MyDrawer extends StatelessWidget {
             leading: const Icon(Icons.settings, color: Colors.purple),
             title: const Text("Settings"),
             onTap: () {
-              // Implement Settings Navigation
               Navigator.pop(context);
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => //
+                      Try(
+                    user: user,
+                  ),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(1.0, 0.0); // Slide in from the right
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+                    var tween = Tween(begin: begin, end: end)
+                        .chain(CurveTween(curve: curve));
+                    var offsetAnimation = animation.drive(tween);
+                    return SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    );
+                  },
+                ),
+              );
             },
           ),
+          // ListTile(
+          //   leading: const Icon(Icons.settings, color: Colors.purple),
+          //   title: const Text("Settings"),
+          //   onTap: () {
+          //     // Implement Settings Navigation
+          //     Navigator.pop(context);
+          //   },
+          // ),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text("Logout"),

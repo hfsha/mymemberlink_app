@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:memberlink_app/models/myevent.dart';
+import 'package:memberlink_app/models/user.dart';
 import 'package:memberlink_app/myconfig.dart';
 import 'package:memberlink_app/views/events/edit_event.dart';
 import 'package:memberlink_app/views/events/new_event.dart';
@@ -11,7 +12,8 @@ import 'package:memberlink_app/views/shared/mydrawer.dart';
 import 'package:http/http.dart' as http;
 
 class EventScreen extends StatefulWidget {
-  const EventScreen({super.key});
+  final User user;
+  const EventScreen({super.key, required this.user});
 
   @override
   State<EventScreen> createState() => _EventScreenState();
@@ -39,7 +41,7 @@ class _EventScreenState extends State<EventScreen> {
         title: const Text(
           "Events",
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -67,89 +69,192 @@ class _EventScreenState extends State<EventScreen> {
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 240, 211, 245),
-              Color.fromARGB(255, 240, 211, 245),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: eventsList.isEmpty
-            ? Center(
-                child: Text(
-                  status,
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Text(
+                  "${eventsList.length} Events Available",
                   style: const TextStyle(
-                    color: Colors.red,
-                    fontSize: 20,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              )
-            : GridView.count(
-                crossAxisCount: 2,
-                childAspectRatio: 0.75,
-                children: List.generate(eventsList.length, (index) {
-                  return Card(
-                    child: InkWell(
-                      splashColor: Colors.purpleAccent,
-                      onLongPress: () => deleteDialog(index),
-                      onTap: () => showEventDetailsDialog(index),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Text(
-                              eventsList[index].eventTitle.toString(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            SizedBox(
-                              child: Image.network(
-                                "${Myconfig.servername}/mymemberlink_backend/assets/events/${eventsList[index].eventFilename}",
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Image.asset(
-                                  "assets/images/na.png",
-                                  height: screenHeight / 6,
-                                ),
-                                width: screenWidth / 2,
-                                height: screenHeight / 6,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              eventsList[index].eventType.toString(),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              df.format(DateTime.parse(
-                                  eventsList[index].eventDate.toString())),
-                            ),
-                            Text(
-                              truncateString(
-                                eventsList[index].eventDescription.toString(),
-                                45,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
               ),
+              child: eventsList.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.event_busy,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            status,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : GridView.builder(
+                      padding: const EdgeInsets.all(16),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.68,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                      ),
+                      itemCount: eventsList.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(15),
+                            onLongPress: () => deleteDialog(index),
+                            onTap: () => showEventDetailsDialog(index),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(15),
+                                  ),
+                                  child: Image.network(
+                                    "${Myconfig.servername}/mymemberlink_backend/assets/events/${eventsList[index].eventFilename}",
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Image.asset(
+                                      "assets/images/na.png",
+                                      height: screenHeight / 6,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    height: screenHeight / 6,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          eventsList[index]
+                                              .eventTitle
+                                              .toString(),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.purple[50],
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          child: Text(
+                                            eventsList[index]
+                                                .eventType
+                                                .toString(),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.purple[700],
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.calendar_today,
+                                              size: 14,
+                                              color: Colors.grey[600],
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                df.format(DateTime.parse(
+                                                    eventsList[index]
+                                                        .eventDate
+                                                        .toString())),
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          truncateString(
+                                            eventsList[index]
+                                                .eventDescription
+                                                .toString(),
+                                            45,
+                                          ),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ),
+        ],
       ),
-      drawer: const MyDrawer(),
+      drawer: MyDrawer(user: widget.user),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -158,9 +263,6 @@ class _EventScreenState extends State<EventScreen> {
           );
         },
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50),
-        ),
         child: const Icon(Icons.add, color: Colors.purple),
       ),
     );

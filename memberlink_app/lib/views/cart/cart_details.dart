@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memberlink_app/models/cart_item.dart';
+import 'package:memberlink_app/models/user.dart';
 import 'package:memberlink_app/myconfig.dart';
 import 'package:memberlink_app/provider/cart_provider.dart';
 import 'package:memberlink_app/views/products/product_screen.dart';
@@ -7,7 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:badges/badges.dart' as badges;
 
 class CartDetails extends StatefulWidget {
-  const CartDetails({super.key});
+  final User user;
+  const CartDetails({super.key, required this.user});
 
   @override
   State<CartDetails> createState() => _CartDetailsState();
@@ -53,7 +55,7 @@ class _CartDetailsState extends State<CartDetails> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          const ProductScreen()),
+                                          ProductScreen(user: widget.user)),
                                 );
                               },
                               child: const Icon(
