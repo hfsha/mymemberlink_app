@@ -1,61 +1,56 @@
 <?php
 include_once("dbconnect.php");
 
+// Set the number of results per page
 $results_per_page = 20;
-if (isset($_GET['pageno'])) {
-    $pageno = (int)$_GET['pageno'];
-} else {
-    $pageno = 1; // Default to page 1 if no page parameter is passed
-}
-
-// Calculate the starting record for the current page
+$pageno = isset($_GET['pageno']) ? (int)$_GET['pageno'] : 1; // Default to page 1 if no parameter passed
 $page_first_result = ($pageno - 1) * $results_per_page;
 
-// SQL query to fetch the products, ordered by date
-$sqlloadproducts = "SELECT * FROM `tbl_products` ORDER BY `product_date` DESC LIMIT $page_first_result, $results_per_page";
+// Set connection charset to UTF-8
+$conn->set_charset("utf8mb4");
 
-// Execute the query
-$result = $conn->query($sqlloadproducts);
+try {
+    // SQL query to fetch products with pagination
+    $sqlloadproducts = "SELECT * FROM `tbl_products` ORDER BY `product_date` DESC LIMIT $page_first_result, $results_per_page";
+    $result = $conn->query($sqlloadproducts);
+    if (!$result) {
+        throw new Exception("Error executing product query: " . $conn->error);
+    }
 
-// Check if the query was successful
-if ($result) {
-    // Get the total number of records in the database
+    // Get total number of records
     $sqltotal = "SELECT COUNT(*) AS total FROM `tbl_products`";
     $totalresult = $conn->query($sqltotal);
+    if (!$totalresult) {
+        throw new Exception("Error executing count query: " . $conn->error);
+    }
+
     $totalrow = $totalresult->fetch_assoc();
     $number_of_result = $totalrow['total'];
-
-    // Calculate the total number of pages
     $number_of_page = ceil($number_of_result / $results_per_page);
 
-    // Prepare the array to return the products
+    // Prepare response
     if ($result->num_rows > 0) {
         $productsarray['products'] = array();
-
-        // Fetch each row and add to the products array
         while ($row = $result->fetch_assoc()) {
-            $product = array();
-            $product['product_id'] = $row['product_id'];
-            $product['product_name'] = $row['product_name'];
-            $product['product_desc'] = $row['product_desc'];
-            $product['product_price'] = $row['product_price'];
-            $product['product_quantity'] = $row['product_quantity'];
-            $product['product_filename'] = $row['product_filename'];
-            $product['product_date'] = $row['product_date'];
+            $product = array(
+                'product_id' => $row['product_id'],
+                'product_name' => utf8_encode($row['product_name']),
+                'product_desc' => utf8_encode($row['product_desc']),
+                'product_price' => $row['product_price'],
+                'product_quantity' => $row['product_quantity'],
+                'product_filename' => utf8_encode($row['product_filename']),
+                'product_date' => $row['product_date']
+            );
             array_push($productsarray['products'], $product);
         }
 
-        // Send a successful response with the products data
         $response = array(
             'status' => 'success',
             'data' => $productsarray,
             'numofpage' => $number_of_page,
             'numberofresult' => $number_of_result
         );
-        sendJsonResponse($response);
-
     } else {
-        // No products found, send a failed response
         $response = array(
             'status' => 'failed',
             'message' => 'No products found',
@@ -63,13 +58,14 @@ if ($result) {
             'numofpage' => $number_of_page,
             'numberofresult' => $number_of_result
         );
-        sendJsonResponse($response);
     }
-} else {
-    // If the query failed, send an error response
+
+    sendJsonResponse($response);
+} catch (Exception $e) {
+    // Catch and handle exceptions
     $response = array(
         'status' => 'error',
-        'message' => 'Database query failed: ' . $conn->error,
+        'message' => $e->getMessage(),
         'data' => null,
         'numofpage' => 0,
         'numberofresult' => 0
@@ -79,11 +75,19 @@ if ($result) {
 
 function sendJsonResponse($sentArray)
 {
-    // Set the header to JSON format
     header('Content-Type: application/json');
 
-    // Send the JSON response
-    echo json_encode($sentArray);
-}
+    // Encode to JSON and handle encoding errors
+    $json = json_encode($sentArray, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'JSON encoding error: ' . json_last_error_msg()
+        ]);
+        exit;
+    }
 
+    echo $json;
+    exit;
+}
 ?>

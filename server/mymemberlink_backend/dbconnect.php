@@ -1,9 +1,9 @@
 
 <?php
 $servername = "localhost";
-$username   = "root";
-$password   = "";
-$dbname     = "mymemberlink_db";
+$username   = "humancmt_hfsha_mymemberlink_admin";
+$password   = ";1E45S(z?G2f";
+$dbname     = "humancmt_hfsha_mymemberlink_db";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
